@@ -1,11 +1,11 @@
-const express = require("express");
+import { PORT } from "./config.js";
+import app from "./app.js";
+import { connectToDB } from "./utils/mongoose.js";
 
-const app = express();
-const port = process.env.PORT || 3000;
+function main() {
+  connectToDB();
+  app.listen(PORT);
+  console.log("Server on port", PORT);
+}
 
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
-
-app.listen(3000);
-console.log("Server on port " + port);
+main();
