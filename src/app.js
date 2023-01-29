@@ -4,7 +4,7 @@ import cors from "cors";
 // import fileUpload from "express-fileupload";
 
 // routes
-import productRoutes from "./routes/products.routes.js";
+import levelRoutes from "./routes/level.routes.js";
 import indexRoutes from "./routes/index.routes.js";
 
 // Initialization
@@ -23,7 +23,7 @@ app.use(express.json());
 
 // Routes
 app.use(indexRoutes);
-app.use("/products", productRoutes);
+app.use("/level", levelRoutes);
 
 // Error Handling
 app.use((req, res) => {
