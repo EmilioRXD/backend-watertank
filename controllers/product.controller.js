@@ -1,84 +1,60 @@
+import { request } from "express";
 import Product from "../models/product.model.js";
-import {uploadImage, deleteImage} from '../utils/cloudinary.js'
-import fs from 'fs-extra'
 
 export const getProducts = async (req, res) => {
   try {
     const products = await Product.find();
-    return res.json(products);
+    res.json(products);
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({ mesagge: error.mesagge });
   }
 };
 
 export const createProduct = async (req, res) => {
-  const { name, description, price } = req.body;
-
-  if (!name) return res.status(404).json({message: 'name is required'})
-  
   try {
-    const newProduct = new Product({
+    const { name, description, price } = req.body;
+    const product = new Product({
       name,
       description,
       price,
     });
-
-    if (req.files?.image) {
-      const result = await uploadImage(req.files.image.tempFilePath)
-      newProduct.image = {
-        public_id: result.public_id,
-        secure_url: result.secure_url
-      }
-      await fs.unlink(req.files.image.tempFilePath)
-    }
-    
-    const savedProduct = await newProduct.save();
-    return res.json(savedProduct);
+    await product.save();
+    return res.json(product);
   } catch (error) {
-    if (req.files?.image) {
-      await fs.unlink(req.files.image.tempFilePath)
-    }
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({ mesagge: error.mesagge });
+  }
+};
+
+export const getProduct = async (req, res) => {
+  try {
+    const product = await Product.findOne({ price: req.params.id });
+    if (!product)
+      return res.satus(404).json({ message: "Element does not exists" });
+    return res.json(product);
+  } catch (error) {
+    return res.status(500).json({ mesagge: error.mesagge });
   }
 };
 
 export const updateProduct = async (req, res) => {
-  const { id } = req.params;
   try {
-    const updatedProduct = await Product.findByIdAndUpdate(id, req.body, {
+    const query = { price: req.params.id };
+    const productUpdate = await Product.findOneAndUpdate(query, req.body, {
       new: true,
     });
-    if (!updatedProduct)
-      return res.status(404).json({ message: "Product Not Found" });
-    return res.json(updatedProduct);
+    return res.json(productUpdate);
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({ mesagge: error.mesagge });
   }
 };
 
 export const deleteProduct = async (req, res) => {
   try {
-    const { id } = req.params;
-    const deletedProduct = await Product.findByIdAndDelete(id);
-
-    if (!deletedProduct) return res.status(404).json({message: 'Product does not exists'})
-
-    await deleteImage(deletedProduct.image.public_id)
-    
-    return res.json(deletedProduct);
+    const product = await Product.findOneAndDelete({ price: req.params.id });
+    if (!product)
+      return res.satus(404).json({ message: "Element does not exists" });
+    return res.json(product);
   } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
-};
-
-export const getProduct = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const productFound = await Product.findById(id);
-    if (!productFound)
-      return res.status(404).json({ message: "Product not found" });
-    return res.json(productFound);
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({ mesagge: error.mesagge });
   }
 };

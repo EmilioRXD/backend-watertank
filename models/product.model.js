@@ -10,15 +10,11 @@ const productSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      trim: true,
+      trim: true
     },
     price: {
       type: Number,
-      default: 0,
-    },
-    image: {
-      secure_url: String,
-      public_id: String
+      default: 0
     }
   },
   {
